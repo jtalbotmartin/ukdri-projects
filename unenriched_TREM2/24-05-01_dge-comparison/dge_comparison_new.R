@@ -12,9 +12,6 @@ setwd("/Volumes/jmm17/projects/ukdrmultiomicsproject/live/MAP_analysis/TREM2_une
 
 # directories:
 
-test <-c("previous_results/de_results_diagnosis_cngeneson_pc_mito_sex_brain_region_apoe_CD33_group_age_PMD")
-                    
-
 ADvControl_dirs <-c("previous_results/de_results_diagnosis_cngeneson_pc_mito_sex_brain_region_apoe_CD33_group_age_PMD",
                     "ADvControl/de_TREM2Variant_NeuropathologicalDiagnosis_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
   
@@ -87,6 +84,36 @@ dge_celltype_statistics <- function(model_path){
   
 }
 
+#################
+
+plot_DE_prop_celltypes <- function (graph_data, graph_title){
+
+  palette_choice <- paletteer::paletteer_d("ggsci::nrc_npg")
+  
+  
+  ggplot(graph_data, aes(x = trem2, y = value, fill = trem2)) +
+    geom_bar(stat = "identity", position = position_dodge(0.8)) +
+    facet_wrap(~ celltype) +
+    geom_hline(yintercept = 0) +
+    scale_color_manual(name = "TREM2", values = palette_choice, 
+                       aesthetics = c("colour", "fill")) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      panel.grid = ggplot2::element_blank(),
+      axis.text = ggplot2::element_text(size = 16, colour = "black"),
+      axis.title = ggplot2::element_text(size = 18),
+      legend.text = ggplot2::element_text(size = 16),
+      legend.title = ggplot2::element_text(size = 16),
+      strip.text = ggplot2::element_text(size = 16)
+    ) +
+    geom_text(aes(label = label, y = label_y)) +
+    labs(x = "TREM2_Var", y = "% Up/Down DE Genes", 
+         title = graph_title)
+  
+}
+
+#####################
+
 #---
 
 prev_ADvControl <- dge_celltype_statistics("previous_results/de_results_diagnosis_cngeneson_pc_mito_sex_brain_region_apoe_CD33_group_age_PMD")
@@ -105,24 +132,10 @@ compare_PHF1_BR <- rbind(prev_PHF1, new_PHF1)
 compare_PHF1_noBR  <- rbind(prev_PHF1, new_PHF1_noBR)
 compare_PHF1_models  <- rbind(new_PHF1, new_PHF1_noBR)
 
-#################
+# plots for new 
 
-palette_choice <- paletteer::paletteer_d("ggsci::nrc_npg")
+plot_DE_prop_celltypes(new_ADvControl, "ADvControl")
+plot_DE_prop_celltypes(new_PHF1, "PHF1")
+plot_DE_prop_celltypes(new_PHF1_noBR, "PHF1")
 
-ggplot(prev_PHF1, aes(x = trem2, y = value, fill = trem2)) +
-  geom_bar(stat = "identity", position = position_dodge(0.8)) +
-  facet_wrap(~ celltype) +
-  geom_hline(yintercept = 0) +
-  scale_color_manual(name = "TREM2", values = palette_choice, 
-                     aesthetics = c("colour", "fill")) +
-  ggplot2::theme_bw() +
-  ggplot2::theme(
-    panel.grid = ggplot2::element_blank(),
-    axis.text = ggplot2::element_text(size = 16, colour = "black"),
-    axis.title = ggplot2::element_text(size = 18),
-    legend.text = ggplot2::element_text(size = 16),
-    legend.title = ggplot2::element_text(size = 16),
-    strip.text = ggplot2::element_text(size = 16)
-  ) +
-  geom_text(aes(label = label, y = label_y)) 
 
