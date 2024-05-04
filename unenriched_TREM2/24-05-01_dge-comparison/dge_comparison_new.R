@@ -132,10 +132,59 @@ compare_PHF1_BR <- rbind(prev_PHF1, new_PHF1)
 compare_PHF1_noBR  <- rbind(prev_PHF1, new_PHF1_noBR)
 compare_PHF1_models  <- rbind(new_PHF1, new_PHF1_noBR)
 
+#---
+
+ABeta <- dge_celltype_statistics("ABbyTREM2/de_TREM2Variant_pct4G8PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group")
+
+
 # plots for new 
 
 plot_DE_prop_celltypes(new_ADvControl, "ADvControl")
 plot_DE_prop_celltypes(new_PHF1, "PHF1")
 plot_DE_prop_celltypes(new_PHF1_noBR, "PHF1")
+plot_DE_prop_celltypes(ABeta, "Aβ")
+
+
+# compress Ex and In Neurons together
+
+compress_neuronal_celltypes <- function(dataframe){
+ 
+  compressed_df <- dataframe %>%
+    mutate(celltype = ifelse(substr(celltype, 1, 3) == "Exc", "Exc", celltype)) %>%
+    mutate(celltype = ifelse(substr(celltype, 1, 3) == "Inh", "Inh", celltype)) %>%
+    group_by(celltype, trem2, pct_de) %>%                   # Group by trem2 and pct_de columns
+    summarise(
+      total_expressed_gene = sum(total_expressed_gene),
+      up = sum(up),
+      down = sum(down)
+    ) %>%
+    mutate(
+      value = ifelse(pct_de == "pct_up", (up / total_expressed_gene) * 100, (down / total_expressed_gene) * 100),
+      label = paste0(round(value, 2), "%"),
+      label_y = ifelse(value > 0, value + 1, value - 1)
+    ) %>%
+    ungroup()
+  
+  return(compressed_df)
+  
+}
+
+
+# # Assuming your dataframe is called 'df'
+# compressed_df <- new_ADvControl %>%
+#   mutate(celltype = ifelse(substr(celltype, 1, 3) == "Exc", "Exc", celltype)) %>%
+#   mutate(celltype = ifelse(substr(celltype, 1, 3) == "Inh", "Inh", celltype)) %>%
+#   group_by(trem2, pct_de) %>%                   # Group by trem2 and pct_de columns
+#   summarise_at(vars(total_expressed_gene, up, down), sum)  # Sum the values in specified columns
+
+# If you want to keep the original rows along with the compressed rows, you can use bind_rows
+final_df <- bind_rows(compressed_df, df %>% filter(substr(celltype, 1, 3) != "Exc"))
+
+
+
+
+split -
+if celltype split [1] exc, inh
+if 
 
 
