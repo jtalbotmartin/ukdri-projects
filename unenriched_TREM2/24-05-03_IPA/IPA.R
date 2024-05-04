@@ -159,13 +159,12 @@ generate_ipa_celltype <- function(celltype_list_of_df, dir_path, padj_threshold 
   }
 }
 
-
-
+setwd("/Volumes/jmm17/projects/ukdrmultiomicsproject/live/MAP_analysis/TREM2_unenriched_scflow/dge/")
 
 ADvControl_list  <- extract_tables_to_celltype_list("ADvControl/de_TREM2Variant_NeuropathologicalDiagnosis_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
 PHF1_list        <- extract_tables_to_celltype_list("PHF1byTREM2/de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
 PHF1_noBR_list   <- extract_tables_to_celltype_list("PHF1byTREM2/de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group")
-
+AB_list          <- extract_tables_to_celltype_list("ABbyTREM2/de_TREM2Variant_pct4G8PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group")
 # getting tables of DEGs for each celltype
 
 setwd("/Volumes/jmm17/projects/ukdrmultiomicsproject/live/MAP_analysis/TREM2_unenriched_scflow/dge/")
@@ -175,9 +174,9 @@ setwd("/Volumes/jmm17/projects/ukdrmultiomicsproject/live/MAP_analysis/TREM2_une
 
 # alter path, and list to generate results for each celltype, after generating sig_deg directory
 
-for (celltype in 1:length(PHF1_noBR_list)){
-  dir_path = paste0("PHF1byTREM2/sig_deg/", names(PHF1_noBR_list)[[celltype]])
-  get_sig_deg_celltype(PHF1_noBR_list[[celltype]], dir_path, 0.05, 0.25)
+for (celltype in 1:length(AB_list)){
+  dir_path = paste0("ABbyTREM2/sig_deg/", names(AB_list)[[celltype]])
+  get_sig_deg_celltype(AB_list[[celltype]], dir_path, 0.05, 1.5)
 }
 
 
@@ -190,9 +189,9 @@ setwd("/Volumes/jmm17/projects/ukdrmultiomicsproject/live/MAP_analysis/TREM2_une
 
 # alter path, and list to generate results for each celltype, after generating sig_deg directory
 
-for (celltype in 1:length(ADvControl_list)){
-  dir_path = paste0("ADvControl/", names(ADvControl_list)[[celltype]])
-  generate_ipa_celltype(ADvControl_list[[celltype]], dir_path, 0.05, 0.25)
+for (celltype in 1:length(AB_list)){
+  dir_path = paste0("ABbyTREM2/", names(AB_list)[[celltype]])
+  generate_ipa_celltype(AB_list[[celltype]], dir_path, 0.05, 0.25)
 }
 
 
