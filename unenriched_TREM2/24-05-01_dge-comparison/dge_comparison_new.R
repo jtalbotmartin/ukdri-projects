@@ -20,36 +20,50 @@ PHF1_dirs  <-     c("previous_results/de_results_TREM2_stratified_PHF1_cngeneson
                     "PHF1byTREM2/de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
 
 
+# Function to calculate differential gene expression statistics for each cell type
+# Input: model_path - directory path containing subdirectories for each cell type, each containing TSV files with gene expression data
+# Output: A dataframe containing statistics for each contrast (pairwise comparison) of gene expression within each cell type
+
+
 dge_celltype_statistics <- function(model_path){
+  # Get list of subdirectories (cell types) within the model_path directory
   celltypes <- dir(model_path)
+  # Initialize an empty list to store results for all cell types
   res_all <- list()
-  # outdir <- "bar_plot_DEG"
-  # dir.create(outdir)
   
+  # Iterate over each cell type directory
   for( celltype in celltypes){
     
+    # Construct full file path for the current cell type
     file_path <- sprintf("%s/%s", model_path, celltype)
     
+    # Get list of TSV files in the current cell type directory
     file_list <- list.files(path = file_path, pattern =".tsv" , full.names = TRUE) #[-4]
     
+    # Read each TSV file into a list of data frames
     dt_l <- lapply(file_list, read.delim)
+    
+    # Assign names to the list elements based on file names (without extension)
     names(dt_l) <- basename(file_list) %>% tools::file_path_sans_ext()
     
+    # Calculate statistics for each contrast within the cell type
     res_l <- lapply(names(dt_l), function(x){
       
+      # Count genes with significant upregulation according to padj and logFC thresholds
       de_up <- dt_l[[x]] %>%
         dplyr::filter(padj <= 0.05, logFC >= 0.25) %>%
         dplyr::pull(gene) %>%
         as.character() %>%
         length()
       
+      # Count genes with significant downregulation according to padj and logFC thresholds
       de_down <- dt_l[[x]] %>%
         dplyr::filter(padj <= 0.05, logFC <= -0.25) %>%
         dplyr::pull(gene) %>%
         as.character() %>%
         length()
       
-      
+      # Create a dataframe with contrast statistics
       tmp_dt <- data.frame(contrast = x,
                            total_expressed_gene = nrow(dt_l[[x]]),
                            up = de_up,
@@ -59,18 +73,24 @@ dge_celltype_statistics <- function(model_path){
                            model= basename(model_path))
     })
     
+    # Combine the list of dataframes into a single dataframe for the current cell type
     res <- do.call(rbind, res_l)
     
+    # Store the results for the current cell type in the res_all list
     res_all[[celltype]] <- res
     
   }
-  
+  # Combine results for all cell types into a single dataframe
   res <- do.call(rbind, res_all)
+  
+  # Extract additional information from contrast names
   res <- res %>%
     mutate(celltype = purrr::map_chr(contrast, ~strsplit(., "_")[[1]][1]),
            trem2 = purrr::map_chr(contrast, ~strsplit(., "_")[[1]][4]), #from 5
            pct_down = -1*pct_down)
   
+  # Reshape the dataframe + create labels for visualization
+
   res_l <- pivot_longer(res, 
                         cols = c(pct_up,pct_down),
                         names_to = "pct_de",
