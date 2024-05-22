@@ -106,6 +106,11 @@ dge_celltype_statistics <- function(model_path){
 
 #################
 
+# Function to plot proportion of differentially expressed genes (DEGs) for each cell type
+# Input:
+#   - graph_data: dataframe containing data to be plotted, with columns 'trem2', 'value', 'celltype', 'label', and 'label_y'
+#   - graph_title: title of the plot
+
 plot_DE_prop_celltypes <- function (graph_data, graph_title){
 
   palette_choice <- paletteer::paletteer_d("ggsci::nrc_npg")
@@ -132,46 +137,13 @@ plot_DE_prop_celltypes <- function (graph_data, graph_title){
   
 }
 
-#####################
-
-#---
-
-prev_ADvControl <- dge_celltype_statistics("previous_results/de_results_diagnosis_cngeneson_pc_mito_sex_brain_region_apoe_CD33_group_age_PMD")
-new_ADvControl  <- dge_celltype_statistics("ADvControl/de_TREM2Variant_NeuropathologicalDiagnosis_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
-
-compare_ADvControl <- rbind(prev_ADvControl, new_ADvControl)
-
-#---
-
-prev_PHF1     <- dge_celltype_statistics("previous_results/de_results_TREM2_stratified_PHF1_cngeneson_pc_mito_sex_brain_region_apoe_CD33_group")
-new_PHF1      <- dge_celltype_statistics("PHF1byTREM2/de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
-new_PHF1_noBR <- dge_celltype_statistics("PHF1byTREM2/de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group")
-
-
-compare_PHF1_BR <- rbind(prev_PHF1, new_PHF1)
-compare_PHF1_noBR  <- rbind(prev_PHF1, new_PHF1_noBR)
-compare_PHF1_models  <- rbind(new_PHF1, new_PHF1_noBR)
-
-#---
-
-ABeta <- dge_celltype_statistics("ABbyTREM2/de_TREM2Variant_pct4G8PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group")
-
-
-# plots for new 
-
-plot_DE_prop_celltypes(new_ADvControl, "ADvControl")
-plot_DE_prop_celltypes(new_PHF1, "PHF1")
-plot_DE_prop_celltypes(new_PHF1_noBR, "PHF1")
-plot_DE_prop_celltypes(ABeta, "Aβ")
-
-
 # compress Ex and In Neurons together
 
 compress_neuronal_celltypes <- function(dataframe){
  
   compressed_df <- dataframe %>%
-    mutate(celltype = ifelse(substr(celltype, 1, 3) == "Exc", "Exc", celltype)) %>%
-    mutate(celltype = ifelse(substr(celltype, 1, 3) == "Inh", "Inh", celltype)) %>%
+    mutate(celltype = ifelse(substr(celltype, 1, 2) == "EN", "EN", celltype)) %>%
+    mutate(celltype = ifelse(substr(celltype, 1, 2) == "IN", "IN", celltype)) %>%
     group_by(celltype, trem2, pct_de) %>%                   # Group by trem2 and pct_de columns
     summarise(
       total_expressed_gene = sum(total_expressed_gene),
@@ -189,6 +161,162 @@ compress_neuronal_celltypes <- function(dataframe){
   
 }
 
+compress_vasc_celltypes <- function(dataframe){
+  
+  compressed_df <- dataframe %>%
+    mutate(celltype = ifelse(celltype == "Endo", "Vasc", celltype)) %>%
+    mutate(celltype = ifelse(celltype == "FB", "Vasc", celltype)) %>%
+    mutate(celltype = ifelse(celltype == "SMC", "Vasc", celltype)) %>%
+    group_by(celltype, trem2, pct_de) %>%                   # Group by trem2 and pct_de columns
+    summarise(
+      total_expressed_gene = sum(total_expressed_gene),
+      up = sum(up),
+      down = sum(down)
+    ) %>%
+    mutate(
+      value = ifelse(pct_de == "pct_up", (up / total_expressed_gene) * 100, (down / total_expressed_gene) * -100),
+      label = paste0(round(value, 2), "%"),
+      label_y = ifelse(value > 0, value + 1, value - 1)
+    ) %>%
+    ungroup()
+  
+  return(compressed_df)
+  
+}
+
+append_comparison_label_to_df <- function(df, comparison_label){
+ df <- df |>
+    mutate("comparison_label" = comparison_label)
+  return(df)
+}
+
+process_prev_df <- function(df){
+  df <- df |>
+    select("celltype", "trem2", "pct_de", "total_expressed_gene", "up", "down", "value", "label", "label_y", "comparison_label") |>
+    filter(trem2 != "TREM2var")
+  return(df)
+}
+
+
+plot_num_DEG_celltype_comparison <- function (graph_data, graph_title, x_label, y_label){
+  
+  palette_choice <- paletteer::paletteer_d("ggsci::nrc_npg")
+  
+  
+  ggplot(graph_data, aes(x = TREM2Compare, y = value, fill = trem2)) +
+    geom_bar(stat = "identity", position = position_dodge(0.8)) +
+    facet_wrap(~ celltype) +
+    geom_hline(yintercept = 0) +
+    scale_color_manual(name = "TREM2", values = palette_choice, 
+                       aesthetics = c("colour", "fill")) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      panel.grid = ggplot2::element_blank(),
+      axis.text = ggplot2::element_text(size = 16, colour = "black"),
+      axis.title = ggplot2::element_text(size = 18),
+      legend.text = ggplot2::element_text(size = 16),
+      legend.title = ggplot2::element_text(size = 16),
+      strip.text = ggplot2::element_text(size = 16)
+    ) +
+    geom_text(aes(label = label, y = label_y)) +
+    labs(x = x_label, y = y_label, 
+         title = graph_title)
+  
+}
+
+########################################
+
+# get plots of 
+
+<model> <-
+  dge_celltype_statistics(<dir>)
+plot_DE_prop_celltypes(<model>, <label>)
+
+
+########################################
+
+#---
+
+# generate statistics between previous and new results for ADvControl
+prev_ADvControl <- dge_celltype_statistics("previous_results/de_results_diagnosis_cngeneson_pc_mito_sex_brain_region_apoe_CD33_group_age_PMD")
+prev_ADvControl <- append_run_label(prev_ADvControl, "0")
+prev_ADvControl <- process_prev_df(prev_ADvControl) # doing this for processing sake 
+
+
+new_ADvControl  <- dge_celltype_statistics("ADvControl/de_TREM2Variant_NeuropathologicalDiagnosis_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
+test_ADvControl <- new_ADvControl
+new_ADvControl <- compress_neuronal_celltypes(new_ADvControl)
+new_ADvControl <- compress_vasc_celltypes(new_ADvControl)
+new_ADvControl <- append_run_label(new_ADvControl, "1")
+
+compare_ADvControl <- rbind(prev_ADvControl, new_ADvControl)
+compare_ADvControl <- compare_ADvControl |>
+  mutate(TREM2Compare = paste0(trem2, ":", comparison_label))
+
+plot_comparison(compare_ADvControl, "ADvControl Comparison w/ Previous Run")
+
+# sanity check
+# > new_ADvControl |>
+#   +     filter(celltype == "EN") |>
+#   +     pull(total_expressed_gene) |>
+#   +     sum()
+
+
+##################################################
+
+
+#---
+
+prev_PHF1 <- dge_celltype_statistics("previous_results/de_results_TREM2_stratified_PHF1_cngeneson_pc_mito_sex_brain_region_apoe_CD33_group")
+prev_PHF1 <- process_prev_df(prev_PHF1) # doing this for processing sake 
+prev_PHF1 <- compress_neuronal_celltypes(prev_PHF1)
+prev_PHF1 <- append_run_label(prev_PHF1, "0")
+
+
+
+new_PHF1 <- dge_celltype_statistics("PHF1byTREM2/de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
+new_PHF1 <- compress_neuronal_celltypes(new_PHF1)
+new_PHF1 <- compress_vasc_celltypes(new_PHF1)
+new_PHF1 <- append_run_label(new_PHF1, "1")
+
+
+new_PHF1_noBR <- dge_celltype_statistics("PHF1byTREM2/de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group")
+new_PHF1_noBR <- compress_neuronal_celltypes(new_PHF1_noBR)
+new_PHF1_noBR <- compress_vasc_celltypes(new_PHF1_noBR)
+new_PHF1_noBR <- append_run_label(new_PHF1_noBR, "1")
+
+compare_PHF1 <- rbind(prev_PHF1, new_PHF1)
+compare_PHF1 <- compare_PHF1 |>
+  mutate(TREM2Compare = paste0(trem2, ":", comparison_label))
+
+plot_comparison(compare_PHF1, "PHF1byTREM2 Comparison w/ Previous Run")
+
+compare_PHF1_noBR <- rbind(prev_PHF1, new_PHF1_noBR)
+compare_PHF1_noBR <- compare_PHF1 |>
+  mutate(TREM2Compare = paste0(trem2, ":", comparison_label))
+
+plot_comparison(compare_PHF1, "PHF1byTREM2 Comparison w/ Previous Run (No Brain Region in Model)")
+
+#---
+
+ABeta <- dge_celltype_statistics("ABbyTREM2/de_TREM2Variant_pct4G8PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group")
+
+
+# plots for new 
+
+plot_DE_prop_celltypes(new_ADvControl, "ADvControl")
+plot_DE_prop_celltypes(new_PHF1, "PHF1")
+plot_DE_prop_celltypes(new_PHF1_noBR, "PHF1")
+plot_DE_prop_celltypes(ABeta, "Aβ")
+
+
+
+
+
+
+
+
+
 
 # # Assuming your dataframe is called 'df'
 # compressed_df <- new_ADvControl %>%
@@ -200,11 +328,5 @@ compress_neuronal_celltypes <- function(dataframe){
 # If you want to keep the original rows along with the compressed rows, you can use bind_rows
 final_df <- bind_rows(compressed_df, df %>% filter(substr(celltype, 1, 3) != "Exc"))
 
-
-
-
-split -
-if celltype split [1] exc, inh
-if 
 
 

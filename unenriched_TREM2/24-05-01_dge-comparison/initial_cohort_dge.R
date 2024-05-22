@@ -148,3 +148,20 @@ new_PHF1_4_basic_comparison <- new_PHF1_4_compare |>
 
 basic_compare_PHF1 <- combine_dfs_for_comparison_by_TREM2(prev_PHF1_basic_comparison, new_PHF1_4_basic_comparison)
 plot_num_DEG_celltype_comparison(basic_compare_PHF1, "PHF1 by TREM2 in Initial Cohort: Previous and Updated Run ", "TREM2_Var (0 = Prev, 1 = Updated)", "% Up/Down DE Genes")
+
+############################################
+
+### plot barcharts of initial cohort
+
+plot_DE_prop_celltypes(new_NPD_1_compare, "de_TREM2Variant_NeuropathologicalDiagnosis_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
+plot_DE_prop_celltypes(new_4G8_1, "de_TREM2Variant_pct4G8PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
+plot_DE_prop_celltypes(new_4G8_2_compare, "de_TREM2Variant_pct4G8PositiveArea_cngeneson_pc_mito_Sex_BrainRegion_APOEgroup_CD33Group")
+plot_DE_prop_celltypes(new_PHF1_1, "de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group")
+plot_DE_prop_celltypes(new_PHF1_2, "de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group")
+plot_DE_prop_celltypes(new_PHF1_3, "de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_APOEgroup_CD33Group")
+plot_DE_prop_celltypes(new_PHF1_4_compare, "de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_BrainRegion_APOEgroup_CD33Group")
+
+
+
+
+
