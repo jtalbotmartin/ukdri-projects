@@ -11,9 +11,9 @@ cd $PBS_O_WORKDIR
 sce_load_path="/data/MAP_analysis/TREM2_unenriched_scflow/results/final/SCE/final_sce"
 sce_save_path="/data/MAP_analysis/TREM2_unenriched_scflow/results/final/sce_rds_obj/sce.rds"
 
-singularity_container_path="/rds/general/user/jmm17/home/ukdri_projects_resources/nfancy-scflow-0.7.2.img"
+singularity_container_path="/rds/general/project/ukdrmultiomicsproject/live/MAP_pipelines/snRNAseq/singularity-cache/nfancy-scflow-0.7.4.img"
 
-script_path="/rds/general/user/jmm17/home/ukdri_projects_code/unenriched_TREM2/scripts/24-03-27_test-analysis/read_save_sce.R"
+script_path="/rds/general/user/jmm17/home/ukdri-projects_code/unenriched_TREM2/24-03-27_test-analysis/scripts/read_save_sce.R"
 
 START=$(date)
 
