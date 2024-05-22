@@ -1,23 +1,21 @@
 #!/usr/bin/env Rscript
-# Perform AUcell ranking and gene-set enrichment of CS genes
 
 #   ____________________________________________________________________________
 #   Initialization                                                          ####
 
-library(renv)
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
 
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+# dependencies <- (c("AUCell", "SingleCellExperiment", "scater", "dplyr", "purrr", "argparse", "cli", "matrixStats", "doParallel", "variancePartition"))
 
-BiocManager::install("AUCell")
-library(AUCell)
-renv::snapshot()
+# uninstalled_dependencies <- dependencies[!(dependencies %in% installed.packages()[,"Package"])]
+# if(length(uninstalled_dependencies)) install.packages(uninstalled_dependencies)
 
 ##  ............................................................................
-##  Load packages                                                           ####
-# library(AUCell)
+##  Load packages     
+                                                      ####
+library(AUCell)
 library(SingleCellExperiment)
-library(scater)
 library(dplyr)
 library(purrr)
 library(argparse)
@@ -60,7 +58,7 @@ geneset_path <- args$geneset_path
 # set working directory
 setwd("/project/ukdri_projects_data/unenriched_trem2")
 
-outdir <- "selective_enrichment_test"
+outdir <- "selective_enrichment_test_1"
 dir.create(outdir)
 
 
@@ -88,7 +86,8 @@ sce <- sce[!is.na(SummarizedExperiment::rowData(sce)$gene), ]
 sce <- sce[!duplicated(SummarizedExperiment::rowData(sce)$gene), ]
 rownames(sce) <- SummarizedExperiment::rowData(sce)$gene
 
-celltype <- gsub("_sce", "", tools::file_path_sans_ext(basename(sce)))
+# celltype <- gsub("_sce", "", tools::file_path_sans_ext(basename(sce))) // usually format is based on the split celltypes I think
+celltype <- tools::file_path_sans_ext(basename(sce))
 
 cli::cli_text("Normalising expression matrix")
  
