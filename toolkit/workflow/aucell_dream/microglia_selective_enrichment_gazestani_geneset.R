@@ -55,6 +55,20 @@ args <- parser$parse_args()
 sce_path <- args$sce_path
 geneset_path <- args$geneset_path
 
+# get command line options, if help option encountered print help and exit,
+# otherwise if options not found on command line then set defaults
+args <- parser$parse_args()
+
+sce_path <- args$sce_path
+geneset_path <- args$geneset_path
+
+# get command line options, if help option encountered print help and exit,
+# otherwise if options not found on command line then set defaults
+args <- parser$parse_args()
+
+sce_path <- args$sce_path
+geneset_path <- args$geneset_path
+
 # set working directory
 setwd("/project/ukdri_projects_data/unenriched_trem2")
 
