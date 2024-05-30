@@ -79,8 +79,8 @@ genesets_l <- qs::qread(geneset_path)
 ##  ............................................................................
 ##  Read and Process SCE object                                             ####
 
-cli::cli_text("Loading  {args$sce} ")
-sce <- qs::qread(args$sce)
+cli::cli_text("Loading  {args$sce_path} ")
+sce <- qs::qread(sce_path)
 
 sce <- sce[!is.na(SummarizedExperiment::rowData(sce)$gene), ]
 sce <- sce[!duplicated(SummarizedExperiment::rowData(sce)$gene), ]
@@ -106,7 +106,7 @@ cells_rankings <- AUCell_buildRankings(exprMat = expr_mat,
                                        nCores= future::availableCores(),
                                        plotStats=FALSE)
 # 
-dir.create(aucell)
+dir.create("aucell")
 qs::qsave(cells_rankings, file = sprintf("aucell/%s_cells_rankings.qs", celltype))
 
 # alt workflow: reading in pre-generated rankings
@@ -129,8 +129,8 @@ gc()
 
 AUscore <- as.matrix(getAUC(cells_AUC))
 
-dir.create(AUscore)
-qs::qsave(AUscore, file = sprintf("AUscore/%s_auscore.qs", celltype))
+# dir.create("AUscore")
+# qs::qsave(AUscore, file = sprintf("AUscore/%s_auscore.qs", celltype))
 
 min_val <- 1
 AUscore_log <- log2(AUscore+min_val)
@@ -155,32 +155,62 @@ dir.create(outdir_name)
 param = SnowParam(future::availableCores(), "SOCK", progressbar=TRUE)
 register(param)
 
-form <- ~ pctAT8PositiveArea + (1| manifest) + total_features_by_counts + pc_mito + BrainRegion + Sex + Age + PostMortemInterval
+##  ............................................................................
+##  pct4G8PositiveArea                                                      ####
+
+form <- ~ pct4G8PositiveArea + (1| manifest) + total_features_by_counts + pc_mito + BrainRegion + Sex + Age + PostMortemInterval
+
+cli::cli_text(paste0("Calculating dream: ", form)
+
 fitmm = dream( AUscore_log, form, metadata)
-res_dream <- topTable( fitmm, coef='aBeta', number=Inf )
+
+# note: coef is the column name / number specifying interest group: use column 2, because for categorical variables, an error occurs due to
+# all groups being added to the name of the variable
+res_dream <- topTable( fitmm, coef=2, number=Inf )
+
+res_dream$geneset <- rownames(res_dream)
+res_dream$form <- paste0(as.character(form), collapse = "")
+res_dream$celltype <- celltype
 
 write.table(x = res_dream, 
-            file = sprintf("%s/%s_%s", outdir_name, celltype, "res_dream_aBeta.tsv"),
+            file = sprintf("%s/%s_%s", outdir_name, celltype, "res_dream_pct4G8PositiveArea.tsv"),
             sep = "\t", 
-            row.names = T)
+            row.names = F) # row.names false to avoid issue with row and column name conflicts for excel users
+
+
+##  ............................................................................
+##  pctPHF1PositiveArea                                                     ####
 
 form <- ~ pctPHF1PositiveArea + (1| manifest) + total_features_by_counts + pc_mito + BrainRegion + Sex + Age + PostMortemInterval
+cli::cli_text(paste0("Calculating dream: ", form)
+
 fitmm = dream( AUscore_log, form, metadata)
-res_dream <- topTable( fitmm, coef='pTau', number=Inf )
+res_dream <- topTable( fitmm, coef=2, number=Inf )
+
+res_dream$geneset <- rownames(res_dream)
+res_dream$form <- paste0(as.character(form), collapse = "")
+res_dream$celltype <- celltype
 
 write.table(x = res_dream, 
-            file = sprintf("%s/%s_%s", outdir_name, celltype, "res_dream_pTau.tsv"),
+            file = sprintf("%s/%s_%s", outdir_name, celltype, "res_dream_pctPHF1PositiveArea.tsv"),
             sep = "\t", 
-            row.names = T)
+            row.names = F)
 
+
+##  ............................................................................
+##  NPD                                                                     ####
 
 form <- ~ NeuropathologicalDiagnosis + (1| manifest) + total_features_by_counts + pc_mito + BrainRegion + Sex + Age + PostMortemInterval
+cli::cli_text(paste0("Calculating dream: ", form)
+
 fitmm = dream( AUscore_log, form, metadata)
-res_dream <- topTable( fitmm, coef='diagnosisAD', number=Inf )
+res_dream <- topTable( fitmm, coef=2, number=Inf )
+
+res_dream$geneset <- rownames(res_dream)
+res_dream$form <- paste0(as.character(form), collapse = "")
+res_dream$celltype <- celltype
 
 write.table(x = res_dream, 
-            file = sprintf("%s/%s_%s", outdir_name, celltype, "res_dream_diagnosis.tsv"),
+            file = sprintf("%s/%s_%s", outdir_name, celltype, "res_dream_NeuropathologicalDiagnosis.tsv"),
             sep = "\t", 
-            row.names = T)
-
-
+            row.names = F)
