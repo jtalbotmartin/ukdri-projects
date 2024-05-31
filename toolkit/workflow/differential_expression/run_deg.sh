@@ -1,6 +1,6 @@
 #!/bin/bash
-#PBS -l walltime=36:00:00
-#PBS -l select=1:ncpus=9:mem=172gb
+#PBS -l walltime=8:00:00
+#PBS -l select=1:ncpus=8:mem=196gb
 #PBS -N DEG_NPD
 #PBS -o /rds/general/project/ukdrmultiomicsproject/live/MAP_analysis/TREM2_unenriched_scflow/dge/initial_cohort/logs/
 #PBS -e /rds/general/project/ukdrmultiomicsproject/live/MAP_analysis/TREM2_unenriched_scflow/dge/initial_cohort/logs/
