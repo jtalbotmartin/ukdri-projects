@@ -163,8 +163,14 @@ for(variant in unique(sce[["TREM2Variant"]])){
   rm(sce_subset)
   gc()
 
-  outdir_name <- sprintf("%s/%s_%s/%s", outdir, "enrichment_res", geneset_name, celltype)
-  dir.create(outdir_name, recursive = TRUE, , showWarnings = FALSE)
+  outdir_4G8 <- sprintf("%s/%s/%s_%s/%s", outdir,  "res_dream_pct4G8PositiveArea",         "enrichment_res", geneset_name, celltype)
+  dir.create(outdir_4G8, recursive = TRUE, , showWarnings = FALSE)
+
+  outdir_PHF1 <- sprintf("%s/%s/%s_%s/%s", outdir, "res_dream_pctPHF1PositiveArea",        "enrichment_res", geneset_name, celltype)
+  dir.create(outdir_PHF1, recursive = TRUE, , showWarnings = FALSE)
+
+  outdir_NPD <- sprintf("%s/%s/%s_%s/%s", outdir,  "res_dream_NeuropathologicalDiagnosis", "enrichment_res", geneset_name, celltype)
+  dir.create(outdir_NPD, recursive = TRUE, , showWarnings = FALSE)
 
   param = SnowParam(future::availableCores(), "SOCK", progressbar=TRUE)
   register(param)
@@ -188,7 +194,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   res_dream$celltype <- celltype
 
   write.table(x = res_dream, 
-              file = sprintf("%s/%s_%s_%s.tsv", outdir_name, celltype, "res_dream_pct4G8PositiveArea", variant),
+              file = sprintf("%s/%s_%s_%s.tsv", outdir_4G8, celltype, "res_dream_pct4G8PositiveArea", variant),
               sep = "\t", 
               row.names = F) # row.names false to avoid issue with row and column name conflicts for excel users
 
@@ -208,7 +214,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   res_dream$celltype <- celltype
 
   write.table(x = res_dream, 
-              file = sprintf("%s/%s_%s_%s.tsv", outdir_name, celltype, "res_dream_pctPHF1PositiveArea", variant),
+              file = sprintf("%s/%s_%s_%s.tsv", outdir_PHF1, celltype, "res_dream_pctPHF1PositiveArea", variant),
               sep = "\t", 
               row.names = F)
 
@@ -228,7 +234,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   res_dream$celltype <- celltype
 
   write.table(x = res_dream, 
-              file = sprintf("%s/%s_%s_%s.tsv", outdir_name, celltype, "res_dream_NeuropathologicalDiagnosis", variant),
+              file = sprintf("%s/%s_%s_%s.tsv", outdir_NPD, celltype, "res_dream_NeuropathologicalDiagnosis", variant),
               sep = "\t", 
               row.names = F)
 }
