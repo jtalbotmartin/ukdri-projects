@@ -135,14 +135,14 @@ plot_comparison <- function (graph_data, graph_title){
     ggplot2::theme_bw() +
     ggplot2::theme(
       panel.grid = ggplot2::element_blank(),
-      axis.text = ggplot2::element_text(size = 16, colour = "black"),
-      axis.title = ggplot2::element_text(size = 18),
-      legend.text = ggplot2::element_text(size = 16),
-      legend.title = ggplot2::element_text(size = 16),
-      strip.text = ggplot2::element_text(size = 16)
+      axis.text = ggplot2::element_text(size = 12, colour = "black"),
+      axis.title = ggplot2::element_text(size = 12),
+      legend.text = ggplot2::element_text(size = 12),
+      legend.title = ggplot2::element_text(size = 12),
+      strip.text = ggplot2::element_text(size = 12)
     ) +
     geom_text(aes(label = label, y = label_y)) +
-    labs(x = "TREM2_Var (0 = Previous Run, 1 = New Run)", y = "% Up/Down DE Genes",
+    labs(x = "TREM2_Var (0 = Initial Cohort, 1 = Full Cohort)", y = "% Up/Down DE Genes",
          title = graph_title)
 
 }
