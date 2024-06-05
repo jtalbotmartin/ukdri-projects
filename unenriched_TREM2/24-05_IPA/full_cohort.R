@@ -5,7 +5,7 @@ library(ggplot2)
 library(tidyr)
 library(scFlow)
 
-setwd("/Volumes/jmm17/projects/ukdrmultiomicsproject/live/MAP_analysis/TREM2_unenriched_scflow/ipa/full_cohort/Pathway_Analysis_CommonSet")
+setwd("/Volumes/jmm17/home/ukdri_projects_code/unenriched_TREM2/24-05_IPA")
 source("../../toolkit/R/ipa.R")
 source("/Volumes/jmm17/projects/ukdrmultiomicsproject/live/MAP_pipelines/snRNAseq/DGE_scripts/pathway_enrichment_enrichR.r")
 
@@ -15,6 +15,8 @@ NPD1_list    <- extract_tables_to_celltype_list(paste0(DGE_tables_dir, "de_TREM2
 ABeta_1_list <- extract_tables_to_celltype_list(paste0(DGE_tables_dir, "de_TREM2Variant_pct4G8PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group"))
 PHF1_1_list  <- extract_tables_to_celltype_list(paste0(DGE_tables_dir, "de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_APOEgroup_CD33Group"))
 PHF1_2_list  <- extract_tables_to_celltype_list(paste0(DGE_tables_dir, "de_TREM2Variant_pctPHF1PositiveArea_cngeneson_pc_mito_Sex_Age_PostMortemInterval_BrainRegion_APOEgroup_CD33Group"))
+
+setwd("/Volumes/jmm17/projects/ukdrmultiomicsproject/live/MAP_analysis/TREM2_unenriched_scflow/ipa/full_cohort/Pathway_Analysis_CommonSet")
 
 # for (celltype in 1:length(list)){
 #   dir.create("pathway_")
