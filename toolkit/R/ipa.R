@@ -41,8 +41,9 @@ generate_ipa_celltype_separate_updown <- function(celltype_list_of_df, dir_path,
     # outdir <- paste0(dir_path,"/PA_", strsplit(names(celltype_list_of_df)[[i]], "_")[[1]][[4]])
     # dir.create(outdir)
     
-    contrast <- "CV"
-    
+    split_celltype_list <- strsplit(names(celltype_list_of_df)[[i]], "_")
+    contrast <- tail(split_celltype_list[[1]], n=1)
+
     for(direction in c("up", "down")){
       
       if(direction == "up"){
