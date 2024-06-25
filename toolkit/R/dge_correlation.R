@@ -128,6 +128,9 @@ dge_correlations <- function(celltype_list_of_df_1, celltype_list_of_df_2, depen
 
         palette_choice <- paletteer::paletteer_d("ggsci::default_nejm")
         
+        # set options to avoid limiting the number of labels
+        options(ggrepel.max.overlaps = Inf)
+        
         # plot figure including labels of top DE genes
 
         plot<-ggplot(dt) +
@@ -136,10 +139,11 @@ dge_correlations <- function(celltype_list_of_df_1, celltype_list_of_df_2, depen
             geom_vline(xintercept = 0) +
             ggrepel::geom_label_repel(aes(x = logFC_df1, y = logFC_df2, label = label), 
                        color = "black", 
-                       size = 3, 
+                       min.segment.length = 0, 
+                       size = 2.5, 
                        box.padding = 0.5, 
                        point.padding = 0.5,
-                       force = 5,
+                       force = 3,
                        show.legend = FALSE) +
             xlab(label1)+
             ylab(label2)+
