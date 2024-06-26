@@ -1,3 +1,8 @@
+##########################################################################
+# script to visualise geneset enrichment across celltypes,
+# by variant, faceted by model contrast using data from GSEA workflow
+##########################################################################
+
 library(dplyr)
 library(ggplot2)
 
