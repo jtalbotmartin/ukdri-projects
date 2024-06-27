@@ -7,21 +7,24 @@ plot_facet_trem2var_segregated <- function(trem2var_stratified_df, title_label){
     # plot geneset enrichment scores, by each celltype, faceted by each contrast
     # colour by z-score, outline by significance
 
-    ggplot(trem2var_stratified_df, aes(x = celltype, y = geneset, fill = z.std, color = significance )) +
+    ggplot(trem2var_stratified_df, aes(x = contrast_truncated, y = geneset, fill = z.std, stroke = ifelse(significance, 0.75, 0))) +
     geom_point(aes(size = abs(z.std)), shape = 21) +
     xlab("") +
     ylab("") +
     ggtitle(title_label) +
-    scale_x_discrete(position = "top") +
-    facet_grid(rows = vars(contrast_truncated)) +
+    scale_x_discrete(position = "bottom") +
+    facet_grid(cols = vars(celltype)) +
     scale_fill_distiller(name = "Z-score", 
                         palette = "RdYlBu", direction = -1) +
     scale_size(range = c(2, 7)) +
-    guides(size = "none") +
+    guides(size = "none", color = "none") +
     theme_bw() +
-    theme(axis.text.x = element_text(colour = "black", size = 11),
+    theme(axis.text.x = element_text(colour = "black", size = 11, angle = 90, vjust = 0.5, hjust = 1),
             axis.text.y = element_text(colour = "black", size = 11), 
-  ) 
+            strip.text.x = element_text(size = 12, angle = 45), 
+            strip.background = element_blank(),
+            panel.spacing = unit(0.1, "lines")
+  )
 }
 
 ##########################################################################
