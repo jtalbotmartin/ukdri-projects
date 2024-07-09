@@ -178,7 +178,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   ##  ............................................................................
   ##  pct4G8PositiveArea                                                      ####
 
-  form <- ~ pct4G8PositiveArea + (1| manifest) + total_features_by_counts + pc_mito + BrainRegion + Sex + Age + PostMortemInterval
+  form <- ~ pct4G8PositiveArea + (1| manifest) + total_features_by_counts + pc_mito + Sex + Age + PostMortemInterval + BrainRegion + CD33Group + APOEgroup
 
   cli::cli_text("{variant}: Calculating dream {form}")
 
@@ -202,7 +202,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   ##  ............................................................................
   ##  pctPHF1PositiveArea                                                     ####
 
-  form <- ~ pctPHF1PositiveArea + (1| manifest) + total_features_by_counts + pc_mito + BrainRegion + Sex + Age + PostMortemInterval
+  form <- ~ pctPHF1PositiveArea + (1| manifest) + total_features_by_counts + pc_mito + Sex + Age + PostMortemInterval + BrainRegion + CD33Group + APOEgroup
   cli::cli_text("{variant}: Calculating dream {form}")
 
 
@@ -222,7 +222,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   ##  ............................................................................
   ##  NPD                                                                     ####
 
-  form <- ~ NeuropathologicalDiagnosis + (1| manifest) + total_features_by_counts + pc_mito + BrainRegion + Sex + Age + PostMortemInterval
+  form <- ~ NeuropathologicalDiagnosis + (1| manifest) + total_features_by_counts + pc_mito + Sex + Age + PostMortemInterval + BrainRegion + CD33Group + APOEgroup
   cli::cli_text("{variant}: Calculating dream {form}")
 
     
