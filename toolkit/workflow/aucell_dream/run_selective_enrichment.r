@@ -102,10 +102,10 @@ for(variant in unique(sce[["TREM2Variant"]])){
   sce_subset <- sce_subset[!duplicated(SummarizedExperiment::rowData(sce_subset)$gene), ]
   rownames(sce_subset) <- SummarizedExperiment::rowData(sce_subset)$gene
 
-  cli::cli_text("Normalising expression matrix")
+  cli::cli_text("CPM normalising expression matrix")
   
   expr_mat <- scater::calculateCPM(sce_subset, exprs_values = "counts")
-  expr_mat <- as.matrix(log2(expr_mat + 1))
+  expr_mat <- as.matrix(expr_mat)
   
   ##  ............................................................................
   ##  get celltype name and process expression matrix                         ####
@@ -146,9 +146,6 @@ for(variant in unique(sce[["TREM2Variant"]])){
   dir.create(aucell_auscore_dir, recursive = TRUE)
   qs::qsave(AUscore, file = sprintf("%s/%s_cells_rankings_%s.qs", aucell_auscore_dir, celltype, variant))
 
-  min_val <- 1
-  AUscore_log <- log2(AUscore+min_val)
-
   rm(cells_AUC)
   gc()
 
@@ -183,7 +180,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   cli::cli_text("{variant}: Calculating dream {form}")
 
 
-  fitmm = dream( AUscore_log, form, metadata)
+  fitmm = dream( AUscore, form, metadata)
 
   # note: coef is the column name / number specifying interest group: use column 2, because for categorical variables, an error occurs due to
   # all groups being added to the name of the variable
@@ -206,7 +203,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   cli::cli_text("{variant}: Calculating dream {form}")
 
 
-  fitmm = dream( AUscore_log, form, metadata)
+  fitmm = dream( AUscore, form, metadata)
   res_dream <- topTable( fitmm, coef=2, number=Inf )
 
   res_dream$geneset <- rownames(res_dream)
@@ -226,7 +223,7 @@ for(variant in unique(sce[["TREM2Variant"]])){
   cli::cli_text("{variant}: Calculating dream {form}")
 
     
-  fitmm = dream( AUscore_log, form, metadata)
+  fitmm = dream( AUscore, form, metadata)
   res_dream <- topTable( fitmm, coef=2, number=Inf )
 
   res_dream$geneset <- rownames(res_dream)
