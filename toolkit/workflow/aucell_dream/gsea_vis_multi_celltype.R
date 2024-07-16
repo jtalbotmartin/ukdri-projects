@@ -37,6 +37,10 @@ process_gsea_enrichment <- function(enrichment_results_toplevel_dir){
     # List all files in the directory
     all_files <- list.files(enrichment_results_toplevel_dir, full.names = TRUE, recursive = TRUE)
 
+    # remove AUCell rankings / scores, retaining only the res_dream output
+    aucell_output <- grepl("ranking", all_files)
+    all_files <- all_files[!aucell_output]
+
     celltype_output_dfs <- list()
 
     # process all files in enrichment result top-level directory (+ its subdirs)
@@ -68,6 +72,9 @@ process_gsea_enrichment <- function(enrichment_results_toplevel_dir){
         contrast_truncated == "pct4G8PositiveArea"         ~ "4G8",
         contrast_truncated == "pctPHF1PositiveArea"        ~ "PHF1"))
 
+    # unlist trem2 column to make available for plotting by facet
+    combined_celltype_df$trem2 <- unlist(combined_celltype_df$trem2)
+    
     # return unfiltered object for visualisation
     return(combined_celltype_df)
 }
